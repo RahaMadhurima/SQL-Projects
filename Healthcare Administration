@@ -1,0 +1,81 @@
+-- Create tables
+CREATE TABLE Patients (
+    patient_id INT PRIMARY KEY,
+    patient_name VARCHAR(100),
+    date_of_birth DATE,
+    gender VARCHAR(10),
+    address VARCHAR(255),
+    phone_number VARCHAR(15)
+);
+
+CREATE TABLE Doctors (
+    doctor_id INT PRIMARY KEY,
+    doctor_name VARCHAR(100),
+    specialization VARCHAR(100),
+    qualification VARCHAR(100),
+    phone_number VARCHAR(15)
+);
+
+CREATE TABLE Appointments (
+    appointment_id INT PRIMARY KEY,
+    patient_id INT,
+    doctor_id INT,
+    appointment_date DATE,
+    appointment_time TIME,
+    FOREIGN KEY (patient_id) REFERENCES Patients(patient_id),
+    FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id)
+);
+
+CREATE TABLE Medications (
+    medication_id INT PRIMARY KEY,
+    medication_name VARCHAR(100),
+    description VARCHAR(255)
+);
+
+CREATE TABLE Prescriptions (
+    prescription_id INT PRIMARY KEY,
+    appointment_id INT,
+    medication_id INT,
+    dosage VARCHAR(50),
+    FOREIGN KEY (appointment_id) REFERENCES Appointments(appointment_id),
+    FOREIGN KEY (medication_id) REFERENCES Medications(medication_id)
+);
+
+-- Insert sample data
+INSERT INTO Patients (patient_id, patient_name, date_of_birth, gender, address, phone_number) VALUES
+    (1, 'Patient 1', '1990-05-15', 'Male', '123 Main St, City', '123-456-7890'),
+    (2, 'Patient 2', '1985-10-20', 'Female', '456 Elm St, Town', '987-654-3210'),
+    (3, 'Patient 3', '1978-03-08', 'Male', '789 Oak St, Village', '111-222-3333');
+
+INSERT INTO Doctors (doctor_id, doctor_name, specialization, qualification, phone_number) VALUES
+    (1, 'Doctor A', 'Cardiologist', 'MD, Cardiology', '555-123-4567'),
+    (2, 'Doctor B', 'Pediatrician', 'MD, Pediatrics', '555-987-6543'),
+    (3, 'Doctor C', 'Dermatologist', 'MD, Dermatology', '555-789-0123');
+
+INSERT INTO Appointments (appointment_id, patient_id, doctor_id, appointment_date, appointment_time) VALUES
+    (1, 1, 1, '2024-05-10', '10:00'),
+    (2, 2, 2, '2024-05-12', '11:00'),
+    (3, 3, 3, '2024-05-15', '14:00');
+
+INSERT INTO Medications (medication_id, medication_name, description) VALUES
+    (1, 'Medication A', 'Description for Medication A'),
+    (2, 'Medication B', 'Description for Medication B'),
+    (3, 'Medication C', 'Description for Medication C');
+
+INSERT INTO Prescriptions (prescription_id, appointment_id, medication_id, dosage) VALUES
+    (1, 1, 1, '1 pill daily for 7 days'),
+    (2, 2, 2, '2 pills twice a day for 10 days'),
+    (3, 3, 3, 'Apply on affected area twice daily for 2 weeks');
+
+-- Query to retrieve patient appointments
+SELECT p.patient_name, d.doctor_name, a.appointment_date, a.appointment_time
+FROM Appointments a
+JOIN Patients p ON a.patient_id = p.patient_id
+JOIN Doctors d ON a.doctor_id = d.doctor_id;
+
+-- Query to retrieve prescriptions for a patient
+SELECT p.patient_name, m.medication_name, pr.dosage
+FROM Prescriptions pr
+JOIN Appointments a ON pr.appointment_id = a.appointment_id
+JOIN Patients p ON a.patient_id = p.patient_id
+JOIN Medications m ON pr.medication_id = m.medication_id;
