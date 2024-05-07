@@ -1,0 +1,67 @@
+-- Create tables
+CREATE TABLE Authors (
+    author_id INT PRIMARY KEY,
+    author_name VARCHAR(100)
+);
+
+CREATE TABLE Books (
+    book_id INT PRIMARY KEY,
+    title VARCHAR(100),
+    author_id INT,
+    genre VARCHAR(50),
+    quantity INT,
+    FOREIGN KEY (author_id) REFERENCES Authors(author_id)
+);
+
+CREATE TABLE Members (
+    member_id INT PRIMARY KEY,
+    member_name VARCHAR(100),
+    email VARCHAR(100),
+    join_date DATE
+);
+
+CREATE TABLE BorrowedBooks (
+    borrow_id INT PRIMARY KEY,
+    book_id INT,
+    member_id INT,
+    borrow_date DATE,
+    due_date DATE,
+    return_date DATE,
+    FOREIGN KEY (book_id) REFERENCES Books(book_id),
+    FOREIGN KEY (member_id) REFERENCES Members(member_id)
+);
+
+-- Insert sample data
+INSERT INTO Authors (author_id, author_name) VALUES
+    (1, 'Author 1'),
+    (2, 'Author 2'),
+    (3, 'Author 3');
+
+INSERT INTO Books (book_id, title, author_id, genre, quantity) VALUES
+    (1, 'Book 1', 1, 'Fiction', 5),
+    (2, 'Book 2', 2, 'Non-Fiction', 3),
+    (3, 'Book 3', 1, 'Fiction', 2),
+    (4, 'Book 4', 3, 'Science', 4);
+
+INSERT INTO Members (member_id, member_name, email, join_date) VALUES
+    (1, 'Member 1', 'member1@example.com', '2024-01-01'),
+    (2, 'Member 2', 'member2@example.com', '2024-02-15'),
+    (3, 'Member 3', 'member3@example.com', '2024-03-20');
+
+INSERT INTO BorrowedBooks (borrow_id, book_id, member_id, borrow_date, due_date, return_date) VALUES
+    (1, 1, 1, '2024-04-05', '2024-04-25', '2024-04-20'),
+    (2, 2, 2, '2024-04-10', '2024-04-30', NULL),
+    (3, 3, 3, '2024-04-15', '2024-05-05', NULL);
+
+-- Query to retrieve available books
+SELECT b.book_id, b.title, a.author_name, b.genre, b.quantity
+FROM Books b
+JOIN Authors a ON b.author_id = a.author_id
+WHERE b.quantity > 0;
+
+-- Query to retrieve borrowed books
+SELECT b.book_id, b.title, a.author_name, m.member_name, bb.borrow_date, bb.due_date, bb.return_date
+FROM BorrowedBooks bb
+JOIN Books b ON bb.book_id = b.book_id
+JOIN Authors a ON b.author_id = a.author_id
+JOIN Members m ON bb.member_id = m.member_id;
